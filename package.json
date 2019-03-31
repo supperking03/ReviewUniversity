@@ -1,8 +1,8 @@
 {
   "name": "review-university",
   "version": "0.1.0",
+  "homepage": "https://supperking03.github.io/",
   "private": true,
-  "homepage": "https://zphong.github.io/ReviewUniversity/",
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "bootstrap": "^4.3.1",
