@@ -25,6 +25,18 @@ class APIModel {
       });
   };
 
+  getRecentReviews = async () => {
+    // eslint-disable-next-line no-undef
+    return fetch(`${apiUrl}Reviews/newest`)
+      .then(response => response.json())
+      .then(data => {
+        return data;
+      })
+      .catch(error => {
+        console.log('error', error);
+      });
+  };
+
   postReview = async reviewData => {
     // eslint-disable-next-line no-undef
     return fetch(`${apiUrl}Reviews`, {
@@ -34,13 +46,13 @@ class APIModel {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(reviewData)
-    })
-      .then(response => {
-        return response.json();
-      })
-      .then(responseData => {
-        alert(JSON.stringify(responseData));
-      });
+    }).then(response => {
+      return response.json();
+    }).then(response=>{
+      if(response.id)
+        return true;
+      return response.Context.toString().replace(',','\n');
+    });
   };
 
   postReply = async replyData => {
@@ -52,13 +64,13 @@ class APIModel {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(replyData)
-    })
-      .then(response => {
-        return response.json();
-      })
-      .then(responseData => {
-        alert(JSON.stringify(responseData));
-      });
+    }).then(response => {
+      return response.json();
+    }).then(response=>{
+        if(response.id)
+            return true;
+        return response.Context.toString().replace(',','\n');
+    });
   };
 
   postUniversity = async universityData => {
@@ -70,13 +82,13 @@ class APIModel {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(universityData)
-    })
-      .then(response => {
-        return response.json();
-      })
-      .then(responseData => {
-        alert(JSON.stringify(responseData));
-      });
+    }).then(response => {
+      return response.json();
+    }).then(response=>{
+        if(response.id)
+            return true;
+        return response.Context.toString().replace(',','\n');
+    });
   };
 }
 

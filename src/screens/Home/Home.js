@@ -3,262 +3,60 @@ import AutoCompleteTextInput from './components/AutoCompleteTextInput';
 import './css/Home.css';
 import UniversityList from './components/UniversityList';
 import apiModel from '../../api/APIModel';
+import moment from 'moment';
+import LoadingScreen from 'react-loading-screen';
 
 const Title = 'Review trường đại học';
-const countries = [
-  'Afghanistan',
-  'Albania',
-  'Algeria',
-  'Andorra',
-  'Angola',
-  'Anguilla',
-  'Antigua &amp; Barbuda',
-  'Argentina',
-  'Armenia',
-  'Aruba',
-  'Australia',
-  'Austria',
-  'Azerbaijan',
-  'Bahamas',
-  'Bahrain',
-  'Bangladesh',
-  'Barbados',
-  'Belarus',
-  'Belgium',
-  'Belize',
-  'Benin',
-  'Bermuda',
-  'Bhutan',
-  'Bolivia',
-  'Bosnia &amp; Herzegovina',
-  'Botswana',
-  'Brazil',
-  'British Virgin Islands',
-  'Brunei',
-  'Bulgaria',
-  'Burkina Faso',
-  'Burundi',
-  'Cambodia',
-  'Cameroon',
-  'Canada',
-  'Cape Verde',
-  'Cayman Islands',
-  'Central Arfrican Republic',
-  'Chad',
-  'Chile',
-  'China',
-  'Colombia',
-  'Congo',
-  'Cook Islands',
-  'Costa Rica',
-  'Cote D Ivoire',
-  'Croatia',
-  'Cuba',
-  'Curacao',
-  'Cyprus',
-  'Czech Republic',
-  'Denmark',
-  'Djibouti',
-  'Dominica',
-  'Dominican Republic',
-  'Ecuador',
-  'Egypt',
-  'El Salvador',
-  'Equatorial Guinea',
-  'Eritrea',
-  'Estonia',
-  'Ethiopia',
-  'Falkland Islands',
-  'Faroe Islands',
-  'Fiji',
-  'Finland',
-  'France',
-  'French Polynesia',
-  'French West Indies',
-  'Gabon',
-  'Gambia',
-  'Georgia',
-  'Germany',
-  'Ghana',
-  'Gibraltar',
-  'Greece',
-  'Greenland',
-  'Grenada',
-  'Guam',
-  'Guatemala',
-  'Guernsey',
-  'Guinea',
-  'Guinea Bissau',
-  'Guyana',
-  'Haiti',
-  'Honduras',
-  'Hong Kong',
-  'Hungary',
-  'Iceland',
-  'India',
-  'Indonesia',
-  'Iran',
-  'Iraq',
-  'Ireland',
-  'Isle of Man',
-  'Israel',
-  'Italy',
-  'Jamaica',
-  'Japan',
-  'Jersey',
-  'Jordan',
-  'Kazakhstan',
-  'Kenya',
-  'Kiribati',
-  'Kosovo',
-  'Kuwait',
-  'Kyrgyzstan',
-  'Laos',
-  'Latvia',
-  'Lebanon',
-  'Lesotho',
-  'Liberia',
-  'Libya',
-  'Liechtenstein',
-  'Lithuania',
-  'Luxembourg',
-  'Macau',
-  'Macedonia',
-  'Madagascar',
-  'Malawi',
-  'Malaysia',
-  'Maldives',
-  'Mali',
-  'Malta',
-  'Marshall Islands',
-  'Mauritania',
-  'Mauritius',
-  'Mexico',
-  'Micronesia',
-  'Moldova',
-  'Monaco',
-  'Mongolia',
-  'Montenegro',
-  'Montserrat',
-  'Morocco',
-  'Mozambique',
-  'Myanmar',
-  'Namibia',
-  'Nauro',
-  'Nepal',
-  'Netherlands',
-  'Netherlands Antilles',
-  'New Caledonia',
-  'New Zealand',
-  'Nicaragua',
-  'Niger',
-  'Nigeria',
-  'North Korea',
-  'Norway',
-  'Oman',
-  'Pakistan',
-  'Palau',
-  'Palestine',
-  'Panama',
-  'Papua New Guinea',
-  'Paraguay',
-  'Peru',
-  'Philippines',
-  'Poland',
-  'Portugal',
-  'Puerto Rico',
-  'Qatar',
-  'Reunion',
-  'Romania',
-  'Russia',
-  'Rwanda',
-  'Saint Pierre &amp; Miquelon',
-  'Samoa',
-  'San Marino',
-  'Sao Tome and Principe',
-  'Saudi Arabia',
-  'Senegal',
-  'Serbia',
-  'Seychelles',
-  'Sierra Leone',
-  'Singapore',
-  'Slovakia',
-  'Slovenia',
-  'Solomon Islands',
-  'Somalia',
-  'South Africa',
-  'South Korea',
-  'South Sudan',
-  'Spain',
-  'Sri Lanka',
-  'St Kitts &amp; Nevis',
-  'St Lucia',
-  'St Vincent',
-  'Sudan',
-  'Suriname',
-  'Swaziland',
-  'Sweden',
-  'Switzerland',
-  'Syria',
-  'Taiwan',
-  'Tajikistan',
-  'Tanzania',
-  'Thailand',
-  "Timor L'Este",
-  'Togo',
-  'Tonga',
-  'Trinidad &amp; Tobago',
-  'Tunisia',
-  'Turkey',
-  'Turkmenistan',
-  'Turks &amp; Caicos',
-  'Tuvalu',
-  'Uganda',
-  'Ukraine',
-  'United Arab Emirates',
-  'United Kingdom',
-  'United States of America',
-  'Uruguay',
-  'Uzbekistan',
-  'Vanuatu',
-  'Vatican City',
-  'Venezuela',
-  'Vietnam',
-  'Virgin Islands (US)',
-  'Yemen',
-  'Zambia',
-  'Zimbabwe'
-];
+const subTitle = 'Hóng phốt, drama của hơn 100 trường đại học tại Việt Nam';
+let universities = [];
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayCount: 3,
-      data: []
+      displayCount: 10,
+      data: [],
+      recentReviews: [],
+      loading: true
     };
+
+    this.getNameFromId = this.getNameFromId.bind(this);
   }
 
   async componentWillMount() {
     const data = await apiModel.getUniversities();
-    this.setState({ data });
+    universities = data.map((uni) => {
+      return { name: uni.name, id: uni.id };
+    });
+    const recentReviews = await apiModel.getRecentReviews();
+    // console.log("aaa", recentReviews);
+    this.setState({ data, recentReviews, loading: false });
   }
+
+  formatDate = (milisec) => {
+    return moment(milisec).format('HH:mm, DD/MM/YYYY');
+  };
 
   renderTitle = () => {
     return (
-      <div className="Title">
-        <h2 className="font-weight-bold text-light mb-5">{Title}</h2>
+      <div className="title-container">
+        <LoadingScreen
+          loading={this.state.loading}
+          bgColor="#f1f1f1"
+          spinnerColor="#9ee5f8"
+          textColor="#676767"
+          logoSrc={require('./../../assets/icons/loading.png')}
+          text="Đang tải dữ liệu"
+        />
+        <h2 className="font-weight-bold text-light py-4">{Title}</h2>
+        <h5 className="font-weight-bold text-light py-4">{subTitle}</h5>
         <form className="mb-3">
           <div className="form-row TitleForm">
             <div className="d-flex flex-fill h-100">
-              <AutoCompleteTextInput suggestions={countries} />
+              <AutoCompleteTextInput suggestions={universities} />
             </div>
             <div className="col-auto px-0">
-              <button
-                className="btn btn-danger"
-                type="button"
-                id="button-addon2"
-              >
+              <button className="btn btn-danger button-search" type="button" id="button-addon2">
                 Search
               </button>
             </div>
@@ -268,25 +66,61 @@ class Home extends React.Component {
     );
   };
 
+  getNameFromId(universityId, data) {
+    let name = '';
+    data.find((item) => {
+      if (item.id === universityId) {
+        name = item.name;
+      }
+    });
+    return name;
+  }
+
+  renderRecentReviews = (recentReviews, data) => {
+    return (
+      <div className="col-12 d-flex flex-column p-0">
+        <h1>Recent reviews</h1>
+        {recentReviews.map((item, index) => (
+          <div key={index} className="d-flex flex-column pb-3 recentContainer mb-2">
+            <div className="recent-reviews-content">
+              <span>&diams;</span>
+              <a href={`/university/${item.universityId}?${item.id}`}>{item.context}</a>
+            </div>
+            <div className="recent-reviews-details">
+              <a href={`university/${item.universityId}?${item.id}`}>{this.getNameFromId(item.universityId, data)}</a>
+              &bull;
+              <p>{this.formatDate(item.createAt)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   onShowMoreClick = () => {
     const { displayCount } = this.state;
-    this.setState({ displayCount: displayCount + 2 });
+    this.setState({ displayCount: displayCount + 5 });
   };
 
   render() {
-    const { displayCount, data } = this.state;
+    const { displayCount, data, recentReviews } = this.state;
     return (
       <div className="Container">
         <div className="px-3 bg-dark pb-1">{this.renderTitle()}</div>
-        <div className="px-3 bg-white pb-1">
-          <UniversityList data={data} displayCount={displayCount} />
-          <button
-            type="submit"
-            className="btn btn-success ml-4"
-            onClick={this.onShowMoreClick}
-          >
-            Xem thêm
-          </button>
+        <div className="px-3 general-content pb-1">
+          <div className="row">
+            <div className="col-lg-8 col-12">
+              <UniversityList data={data} displayCount={displayCount} />
+              {displayCount < data.length && (
+                <button type="submit" className="btn btn-link ml-4 btn-center" onClick={this.onShowMoreClick}>
+                  Xem thêm
+                </button>
+              )}
+            </div>
+            <div className="col-lg-4 col-12 recent-reviews-container">
+              {this.renderRecentReviews(recentReviews, data)}
+            </div>
+          </div>
         </div>
       </div>
     );
